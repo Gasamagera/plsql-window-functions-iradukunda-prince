@@ -1,0 +1,12 @@
+-- 4) Customer total spend and quartiles
+
+SELECT customer_id, name, total_spend,
+       NTILE(4) OVER (ORDER BY total_spend DESC) AS spend_quartile,
+       CUME_DIST() OVER (ORDER BY total_spend DESC) AS cumulative_dist
+FROM (
+  SELECT c.customer_id, c.name, SUM(t.amount) AS total_spend
+  FROM customers c
+  LEFT JOIN transactions t ON c.customer_id = t.customer_id
+  GROUP BY c.customer_id, c.name
+) s
+ORDER BY total_spend DESC;

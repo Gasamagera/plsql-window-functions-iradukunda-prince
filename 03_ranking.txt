@@ -1,0 +1,13 @@
+-- 1) Sum revenue per book per region, then rank them by region
+
+SELECT region, book_id, title, total_revenue,
+       RANK() OVER (PARTITION BY region ORDER BY total_revenue DESC) AS revenue_rank
+FROM (
+  SELECT c.region, b.book_id, b.title, SUM(t.amount) AS total_revenue
+  FROM transactions t
+  JOIN customers c ON t.customer_id = c.customer_id
+  JOIN books b ON t.book_id = b.book_id
+  GROUP BY c.region, b.book_id, b.title
+) x
+WHERE RANK() OVER (PARTITION BY region ORDER BY total_revenue DESC) <= 5
+ORDER BY region, revenue_rank;

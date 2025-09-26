@@ -1,0 +1,13 @@
+-- 2) Monthly totals, then running total
+
+WITH monthly AS (
+  SELECT TRUNC(sale_date,'MM') AS month, SUM(amount) AS month_total
+  FROM transactions
+  GROUP BY TRUNC(sale_date,'MM')
+)
+SELECT month,
+       month_total,
+       SUM(month_total) OVER (ORDER BY month
+                             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total
+FROM monthly
+ORDER BY month;
